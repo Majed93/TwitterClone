@@ -10,7 +10,7 @@ import com.twitter.lib.*;
 public class LoginModel {
 
 	private DataSource _ds = null;
-	 
+	
 	public LoginModel(){
 
 	}
@@ -21,7 +21,8 @@ public class LoginModel {
 	}
 	
 	//Check if login is valid
-	public boolean authenticateLogin(String strUserName, String strPassword, String LOGIN_QUERY) throws Exception {
+	public boolean authenticateLogin(String strUserName, String strPassword) throws Exception {
+			String LOGIN_QUERY = "SELECT * from Users where username=? and password=?;";	
 		   boolean isValid = false;
 		   Connection conn = null;
 		   try {

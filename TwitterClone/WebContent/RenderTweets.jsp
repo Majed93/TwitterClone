@@ -43,7 +43,7 @@ Welcome ${sessionScope['username']} </br>
  <form action = Tweet method="POST">
  	<label>Tweet Something!</label>
  	<br/>
-      <input type="text" id="tweettext" name="tweettext" size="140" style="height: 100px;" />
+      <input type="text" id="tweettext" name="tweettext" size="140" style="height: 100px; width: 95%"/>
       <br/>
       <input type="submit" value="Submit" class=submit />
     </form>

@@ -33,6 +33,7 @@ public class RegModel {
 		 
 		Connection Conn = null;
 		Statement stmt;
+		PreparedStatement pstmt = null;
 		
 		if(check(email,user) == true)
 		{
@@ -41,19 +42,7 @@ public class RegModel {
 		}
 		else
 		{
-			String add = "INSERT INTO Users (email, username, password)" + " VALUE (";
-			add += "'";
-			add += email;
-			add += "'";
-			add += ",";
-			add += "'";
-			add += user;
-			add += "'";
-			add += ",";
-			add += "'";
-			add += pass;
-			add += "'";
-			add += ");";
+			String add = "INSERT INTO Users (email, username, password) VALUE (?,?,?);";
 			
 			try {
 				Conn = _ds.getConnection();
@@ -64,8 +53,14 @@ public class RegModel {
 			}
 			
 			try{
-				stmt = Conn.createStatement();
-			       stmt.executeUpdate(add);
+				//stmt = Conn.createStatement();
+				pstmt = Conn.prepareStatement(add);
+				pstmt.setString(1, email);
+				pstmt.setString(2, user);
+				pstmt.setString(3, pass);
+			       //stmt.executeUpdate(add);
+				pstmt.executeUpdate();
+			       
 			       added = true;
 			}catch(Exception e){
 					added = false;
@@ -92,6 +87,7 @@ public class RegModel {
 		Connection Conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
+		PreparedStatement pstmt = null;
 		
 		try {
 			Conn = _ds.getConnection();
@@ -101,20 +97,25 @@ public class RegModel {
 		}
 	
 		
-		String sqlQuery = "SELECT * FROM Users WHERE username='" + user + "' OR email='" + email + "'";
+		String sqlQuery = "SELECT * FROM Users WHERE username=? OR email=?;";
 		
 		System.out.println("Tweets Query " + sqlQuery);
 		try {
 			try {
-					stmt = Conn.createStatement();
+					//stmt = Conn.createStatement();
+					pstmt = Conn.prepareStatement(sqlQuery);
+					pstmt.setString(1, user);
+					pstmt.setString(2, email);
+					
 			} catch (Exception et) {
 				System.out.println("Can't create preare statement");
 				exists = false;
 			}
 			System.out.println("Created prepare");
 			try {
-				rs=stmt.executeQuery(sqlQuery);
+				//rs=stmt.executeQuery(sqlQuery);
 						
+				rs = pstmt.executeQuery();	
 			} catch(Exception et) {
 				System.out.println("Can not execut query " + et);
 				exists = false;

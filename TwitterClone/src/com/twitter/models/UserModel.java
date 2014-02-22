@@ -28,6 +28,8 @@ public class UserModel {
 	{
 		Connection Conn = null;
 		Statement stmt;
+		PreparedStatement pstmt = null;
+		
 		
 		Integer newprofuser = Integer.valueOf(UserId(profuser));
 		Integer newuser = Integer.valueOf(UserId(user));
@@ -37,15 +39,7 @@ public class UserModel {
 		System.out.println("PROFILE USERid: " + newprofuser);
 		System.out.println("CURRENT USERid: " + newuser);
 		
-		String add = "INSERT INTO Following (followuserid, flwinguserid)" + " VALUE (";
-		add += "'";
-		add += newprofuser;
-		add += "'";
-		add += ",";
-		add += "'";
-		add += newuser;
-		add += "'";
-		add += ");";
+		String add = "INSERT INTO Following (followuserid, flwinguserid) VALUE (?,?);";
 		
 		try {
 			Conn = _ds.getConnection();
@@ -55,8 +49,13 @@ public class UserModel {
 		}
 		
 		try{
-			stmt = Conn.createStatement();
-		       stmt.executeUpdate(add);
+			//stmt = Conn.createStatement();
+			pstmt = Conn.prepareStatement(add);
+			pstmt.setInt(1, newprofuser);
+			pstmt.setInt(2, newuser);
+
+			pstmt.executeUpdate();
+		    //stmt.executeUpdate(add);
 		}catch(Exception e){
 
 		System.out.println(e.toString());
@@ -78,6 +77,7 @@ public class UserModel {
 	{
 		Connection Conn = null;
 		Statement stmt;
+		PreparedStatement pstmt = null;
 		
 		Integer newprofuser = Integer.valueOf(UserId(profuser));
 		Integer newuser = Integer.valueOf(UserId(user));
@@ -87,7 +87,7 @@ public class UserModel {
 		System.out.println("PROFILE USERid: " + newprofuser);
 		System.out.println("CURRENT USERid: " + newuser);
 		
-		String add = "DELETE FROM Following WHERE followuserid='" + newprofuser + "' AND flwinguserid='" + newuser + "'";
+		String add = "DELETE FROM Following WHERE followuserid=? AND flwinguserid=?;";
 		
 		
 		try {
@@ -98,8 +98,13 @@ public class UserModel {
 		}
 		
 		try{
-			stmt = Conn.createStatement();
-		       stmt.executeUpdate(add);
+			//stmt = Conn.createStatement();
+			pstmt = Conn.prepareStatement(add);
+			pstmt.setInt(1, newprofuser);
+			pstmt.setInt(2, newuser);
+
+			pstmt.executeUpdate();
+		    //stmt.executeUpdate(add);
 		       System.out.println("Unfollowed!");
 		}catch(Exception e){
 
@@ -121,6 +126,7 @@ public class UserModel {
 	{
 		Connection Conn = null;
 		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
 		boolean following;
 		Integer newprofuser = Integer.valueOf(UserId(profuser));
@@ -136,19 +142,26 @@ public class UserModel {
 		}
 	
 		
-		String sqlQuery = "SELECT * FROM Following WHERE followuserid='" + newprofuser + "' AND flwinguserid='" + newuser + "'";
+		String sqlQuery = "SELECT * FROM Following WHERE followuserid=? AND flwinguserid=?;";
 		
 		System.out.println("Tweets Query " + sqlQuery);
 		try {
 			try {
-					stmt = Conn.createStatement();
+				//stmt = Conn.createStatement();
+				pstmt = Conn.prepareStatement(sqlQuery);
+				pstmt.setInt(1, newprofuser);
+				pstmt.setInt(2, newuser);
+
 			} catch (Exception et) {
 				System.out.println("Can't create preare statement");
 				following = false;
 			}
 			System.out.println("Created prepare");
 			try {
-				rs=stmt.executeQuery(sqlQuery);
+			
+				rs = pstmt.executeQuery();
+			
+				//rs=stmt.executeQuery(sqlQuery);
 						
 			} catch(Exception et) {
 				System.out.println("Can not execut query " + et);
@@ -188,74 +201,90 @@ public class UserModel {
 	}
 	
 	
-	//Get userid
-	public String UserId(String user)
-	{
-		String uid = null;
-		
-		Connection Conn;
-		TweetStore ps = null;
-		ResultSet rs = null;
-		
-		try {
-			Conn = _ds.getConnection();
-		} catch (Exception et) {
-			System.out.println("No Connection in Tweets Model");
-			return null;
-		}
-		
-		Statement stmt = null;
-		
-		String sqlQuery = "SELECT * FROM Users WHERE username='" + user + "'";
-		
-		System.out.println("Tweets Query " + sqlQuery);
-		try {
+	//Gets user id
+		public String UserId(String user)
+
+		{
+			String uid = null;
+			
+			Connection Conn;
+			TweetStore ps = null;
+			ResultSet rs = null;
+			Statement stmt = null;
+			PreparedStatement pstmt = null;
+			
 			try {
-					stmt = Conn.createStatement();
+				Conn = _ds.getConnection();
 			} catch (Exception et) {
-				System.out.println("Can't create preare statement");
+				System.out.println("No Connection in Tweets Model");
 				return null;
 			}
-			System.out.println("Created prepare");
+			
+			
+			
+			String sqlQuery = "SELECT * FROM users WHERE username=?;";
+			
+			System.out.println("Tweets Query" + sqlQuery);
 			try {
-				rs=stmt.executeQuery(sqlQuery);
-						
-			} catch(Exception et) {
-				System.out.println("Can not execut query " + et);
+				/*
+				try {
+						stmt = Conn.createStatement();
+				} catch (Exception et) {
+					System.out.println("Can't create preare statement");
+					return null;
+				}
+				System.out.println("Created prepare");
+				*/
+				try
+				{
+					pstmt = Conn.prepareStatement(sqlQuery);
+					pstmt.setString(1, user);
+				}
+				catch(Exception e)
+				{
+					System.out.println("Can't create prepare statement");
+					return null;
+				}
+				try {
+					//rs=stmt.executeQuery(sqlQuery);
+					rs = pstmt.executeQuery();	
+					
+				} catch(Exception et) {
+					System.out.println("Can not execut query " + et);
+					return null;
+			
+				}
+				System.out.println("Statement executed");
+				if (rs.wasNull()) {
+				System.out.println("result set was null");
+				} else {
+				System.out.println("Well it wasn't null");
+				}
+				while (rs.next()) {
+				
+					System.out.println("Getting RS");
+					ps = new TweetStore();
+				
+					ps.setUser(rs.getString("idUsers"));
+					ps.setUsername(rs.getString("username"));
+					
+					uid = ps.getUser();
+					
+				}
+			} catch (Exception ex) {
+				System.out.println("Oops, error in query" + ex);
 				return null;
-		
 			}
-			System.out.println("Statement executed");
-			if (rs.wasNull()) {
-			System.out.println("result set was null");
-			} else {
-			System.out.println("Well it wasn't null");
+			try {
+				Conn.close();
+			} catch (Exception ex) {
+				return null;
 			}
-			while (rs.next()) {
+			System.out.println(uid);
 			
-				System.out.println("Getting RS");
-				ps = new TweetStore();
-			
-				ps.setUser(rs.getString("idUsers"));
-				ps.setUsername(rs.getString("username"));
-				
-				uid = ps.getUser();
-				
-			}
-		} catch (Exception ex) {
-			System.out.println("Oops, error in query" + ex);
-			return null;
+			return uid;
 		}
-		try {
-			Conn.close();
-		} catch (Exception ex) {
-			return null;
-		}
-		System.out.println(uid);
-		
-		return uid;
-	}
-	
+
 	
 	//Get users tweets
 	public LinkedList<TweetStore> getTweets(String loguser) 
@@ -266,6 +295,8 @@ public class UserModel {
 		Connection Conn;
 		TweetStore ps = null;
 		ResultSet rs = null;
+		PreparedStatement pstmt = null;
+		Statement stmt = null;
 		
 		try {
 			Conn = _ds.getConnection();
@@ -274,23 +305,25 @@ public class UserModel {
 			return null;
 		}
 		
-		PreparedStatement pmst = null;
-		Statement stmt = null;
 		
-		String sqlQuery = "select t1.*,t2.username from Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers WHERE username='" + loguser + "' ORDER by idTweets DESC";
 		
-		System.out.println("Tweets Query" + sqlQuery);
+		String sqlQuery = "SELECT t1.*,t2.username FROM Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers WHERE username='" + loguser + "' ORDER by idTweets DESC;";
+		
+		System.out.println("Tweets Query " + sqlQuery);
 		try {
 			try {
 					stmt = Conn.createStatement();
+					//pstmt = Conn.prepareStatement(sqlQuery);
+					//pstmt.setString(1, loguser);
+					
 			} catch (Exception et) {
-				System.out.println("Can't create preare statement");
+				System.out.println("Can't create preare statement " + et);
 				return null;
 			}
 			System.out.println("Created prepare");
 			try {
 				rs=stmt.executeQuery(sqlQuery);
-						
+				//rs=pstmt.executeQuery(sqlQuery);	
 			} catch(Exception et) {
 				System.out.println("Can not execut query " + et);
 				return null;

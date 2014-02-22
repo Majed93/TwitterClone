@@ -44,7 +44,7 @@ public class Login extends HttpServlet {
 	private DataSource _ds = null;
 
 	 
-	private static final String LOGIN_QUERY = "SELECT * from Users where username=? and password=?";
+	
 	private static final String HOME_PAGE = "Tweet";
 	private static final String LOGIN_PAGE = "/Login.jsp";
 	
@@ -97,7 +97,7 @@ public class Login extends HttpServlet {
 		        lm.setDatasource(_ds);
 		    	
 		        try {
-					isValidLogon = lm.authenticateLogin(username, password, LOGIN_QUERY);
+					isValidLogon = lm.authenticateLogin(username, password);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

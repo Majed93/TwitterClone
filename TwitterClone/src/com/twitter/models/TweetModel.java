@@ -1,7 +1,9 @@
 package com.twitter.models;
 
 import java.util.LinkedList;
+
 import javax.sql.DataSource;
+
 import java.sql.*;
 
 import com.twitter.lib.*;
@@ -28,16 +30,10 @@ public void insertTweet(String tweet, String user)
 	Connection Conn = null;
 	Statement stmt;
 	Integer uid = Integer.valueOf(UserId(user));
-
-	String add = "INSERT INTO tweets (tweet, user)" + " VALUE (";
-	add += "'";
-	add += tweet;
-	add += "'";
-	add += ",";
-	add += "'";
-	add += uid;
-	add += "'";
-	add += ");";
+	PreparedStatement pstmt = null;
+	
+	
+	String add = "INSERT INTO tweets (tweet, user) VALUE (?,?);";
 	
 	try {
 		Conn = _ds.getConnection();
@@ -47,8 +43,15 @@ public void insertTweet(String tweet, String user)
 	}
 	
 	try{
-		stmt = Conn.createStatement();
-	       stmt.executeUpdate(add);
+		//stmt = Conn.createStatement();
+		
+		pstmt = Conn.prepareStatement(add);
+		pstmt.setString(1, tweet);
+		pstmt.setInt(2, uid);
+
+		
+		pstmt.executeUpdate();
+	    //stmt.executeUpdate(add);
 	}catch(Exception e){
 
 	System.out.println(e.toString());
@@ -72,6 +75,8 @@ public void insertTweet(String tweet, String user)
 		Connection Conn;
 		TweetStore ps = null;
 		ResultSet rs = null;
+		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
 		try {
 			Conn = _ds.getConnection();
@@ -80,12 +85,13 @@ public void insertTweet(String tweet, String user)
 			return null;
 		}
 		
-		Statement stmt = null;
 		
-		String sqlQuery = "SELECT * FROM users WHERE username='" + user + "'";
+		
+		String sqlQuery = "SELECT * FROM users WHERE username=?;";
 		
 		System.out.println("Tweets Query" + sqlQuery);
 		try {
+			/*
 			try {
 					stmt = Conn.createStatement();
 			} catch (Exception et) {
@@ -93,9 +99,21 @@ public void insertTweet(String tweet, String user)
 				return null;
 			}
 			System.out.println("Created prepare");
+			*/
+			try
+			{
+				pstmt = Conn.prepareStatement(sqlQuery);
+				pstmt.setString(1, user);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Can't create prepare statement");
+				return null;
+			}
 			try {
-				rs=stmt.executeQuery(sqlQuery);
-						
+				//rs=stmt.executeQuery(sqlQuery);
+				rs = pstmt.executeQuery();	
+				
 			} catch(Exception et) {
 				System.out.println("Can not execut query " + et);
 				return null;
@@ -152,23 +170,25 @@ public void insertTweet(String tweet, String user)
 			return null;
 		}
 		
-		PreparedStatement pmst = null;
 		Statement stmt = null;
 		//String sqlQuery = "select t1.*,t2.username from tweets AS t1 INNER JOIN users AS t2 ON t1.user = t2.idUsers ORDER by idTweets DESC";
 		
-		String sqlQuery = "select t1.*,t2.username FROM following AS t1 INNER JOIN Users AS t2 ON t1.flwinguserid = t2.idUsers WHERE username='" + loguser + "'";// ORDER by idTweets DESC";
+		String sqlQuery = "select t1.*,t2.username FROM following AS t1 INNER JOIN Users AS t2 ON t1.flwinguserid = t2.idUsers WHERE username=?";// ORDER by idTweets DESC";
 		
 		System.out.println("Tweets Query" + sqlQuery);
 		try {
 			try {
-					stmt = Conn.createStatement();
+					//stmt = Conn.createStatement();
 			} catch (Exception et) {
 				System.out.println("Can't create preare statement");
 				return null;
 			}
 			System.out.println("Created prepare");
 			try {
-				rs=stmt.executeQuery(sqlQuery);
+				 PreparedStatement prepStmt = Conn.prepareStatement(sqlQuery);
+			     prepStmt.setString(1, loguser);
+			     rs = prepStmt.executeQuery();
+				//rs=stmt.executeQuery(sqlQuery);
 						
 			} catch(Exception et) {
 				System.out.println("Can not execut query " + et);
@@ -197,7 +217,7 @@ public void insertTweet(String tweet, String user)
 		
 		
 		
-		String sqlQuery2 = "SELECT t1.*,t2.username from Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers ORDER by idTweets DESC";
+		String sqlQuery2 = "SELECT t1.*,t2.username from Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers ORDER by idTweets DESC;";
 		System.out.println("Tweets Query" + sqlQuery2);
 		try {
 			try {
@@ -270,7 +290,7 @@ public void insertTweet(String tweet, String user)
 		PreparedStatement pmst = null;
 		Statement stmt = null;
 	
-		String sqlQuery = "select t1.*,t2.username from Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers ORDER by idTweets DESC";
+		String sqlQuery = "select t1.*,t2.username from Tweets AS t1 INNER JOIN Users AS t2 ON t1.user = t2.idUsers ORDER by idTweets DESC;";
 		
 		System.out.println("Tweets Query" + sqlQuery);
 		try {

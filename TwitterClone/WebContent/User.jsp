@@ -11,7 +11,7 @@
 div.Table_01 {
 	
 	position:absolute;
-	left:0px;
+	left:10px;
 	top:0px;
 	width:100%;
 	height:768px;
@@ -35,6 +35,32 @@ div.bg-02 {
 	top:82px;
 	width:100%;
 	height:686px;
+	
+}
+input {
+	background-color:#303030;
+	-webkit-border=radius: .3em;
+	-moz-border-radius: .3em;
+	border-radius: .3em;
+
+	
+
+	-moz-box-shadow: 0 -1px 0 0px #000;
+	-webkit-box-shadow: 0 -1px 0 0px #000;
+	box-shadow: 0 -1px 0 0px #000;	
+	opacity:0.9;
+	
+
+	border: none;
+	width:316px;
+	height:27px;	
+	margin:15px 0;
+	color:#fff;
+	padding:0 0 0 10px;
+
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:1.2em;
+	letter-spacing:2px;
 	
 }
 
@@ -69,7 +95,7 @@ input.submit:hover
 <div class="Table_01">
 
 	<div class="bg-01">
-	<table width="100%" height="82" cellpadding="5" cellspacing="0"> <tr> <td valign="bottom">
+	<table width="100%" height="82" cellpadding="5" cellspacing="0" left="5px"> <tr> <td valign="bottom">
 	 <p><b><font color="#ffffff"><center>Profile of <%=request.getAttribute("profuser")%>
 	 </center>	
 	 </font></b></p>
@@ -113,10 +139,10 @@ input.submit:hover
 		<b>You must be logged in</b>
 		
 		<%} %> 
-		
-		
-<input class=submit type="button" value="Back" 
- onClick="history.go(-1);return true;"> 
+	
+<input class=submit type="button" value="Back" onClick="window.navigate('${pageContext.request.contextPath}/Tweet')">
+
+ <!-- onClick="history.go(-1);return true;">  -->
 	 </font></b></p>
 	  </td> </tr>  
 
